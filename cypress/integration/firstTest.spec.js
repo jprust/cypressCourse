@@ -3,6 +3,8 @@
 
 /// <reference types="cypress" />
 
+import { selectDayFromCurrent } from "../support/commands"
+
 // describe can be nested
 describe('First test suite', () => {
 
@@ -10,7 +12,7 @@ describe('First test suite', () => {
         // repetitive code, counts for each describe it's nested in and its children
         cy.visit('/')
     })
-    
+
     it('first test', () => {
         cy.contains('Forms').click()
         cy.contains('Form Layouts').click()
@@ -237,12 +239,12 @@ describe('First test suite', () => {
         cy.get('thead').find('.nb-plus').click()
         cy.get('thead').find('tr').eq(2).then(addRow => {
             cy.wrap(addRow).find('[placeholder="First Name"]').type('Jan')
-            cy.wrap(addRow).find('[placeholder="Last Name"]').type('Prüst')
+            cy.wrap(addRow).find('[placeholder="Last Name"]').type('Doe')
             cy.wrap(addRow).find('.nb-checkmark').click()
         })
         cy.get('tbody tr').first().find('td').then(tableRow => {
             cy.wrap(tableRow).eq(2).should('contain', 'Jan')
-            cy.wrap(tableRow).eq(3).should('contain', 'Prüst')
+            cy.wrap(tableRow).eq(3).should('contain', 'Doe')
         })
         // query rows
         const age = [20, 30, 40, 200]
@@ -260,32 +262,11 @@ describe('First test suite', () => {
 
     it('Web Datepickers', () => {
 
-        function selectDayFromCurrent(day) {
-            // date picker with flexible date selection in HTML property
-            // JavaScript Date method
-            let date = new Date()
-            date.setDate(date.getDate() + day)
-            let futureDay = date.getDate()
-            let futureMonth = date.toLocaleString('default', { month: 'short' })
-            let futureYear = date.getFullYear()
-            dateAssert = futureMonth + ' ' + futureDay + ', ' + futureYear
-
-            cy.get('nb-calendar-navigation').invoke('attr', 'ng-reflect-date').then(dateAttribute => {
-                if (!dateAttribute.includes(futureMonth)) {
-                    cy.get('[data-name="chevron-right"]').click()
-                    selectDayFromCurrent(day)
-                } else {
-                    cy.get('nb-calendar-day-picker [class="day-cell ng-star-inserted"]').contains(futureDay).click()
-                }
-            })
-            return dateAssert
-        }
-
         cy.contains('Forms').click()
         cy.contains('Datepicker').click()
         cy.contains('nb-card', 'Common Datepicker').find('input').then(input => {
             cy.wrap(input).click()
-            let dateAssert = selectDayFromCurrent(300)
+            let dateAssert = selectDayFromCurrent.selectDayFromCurrent(300)
             cy.wrap(input).invoke('prop', 'value').should('contain', dateAssert)
         })
     })
